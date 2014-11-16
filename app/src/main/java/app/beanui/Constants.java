@@ -2,6 +2,7 @@ package app.beanui;
 
 import android.app.Activity;
 import android.app.Application;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,6 +17,11 @@ public class Constants extends Application {
     public static boolean use_lights = true;
     public static boolean use_sound = true;
     public static boolean is_on = false;
-    List<String> music_filenames = new ArrayList<String>();
-    List<String> sfx_filenames = new ArrayList<String>();
+    public static int MAX_VOLUME = 50;
+    public static int[] MUSIC = new int [] {
+            R.raw.test1, R.raw.test2, R.raw.test3
+    };
+    public static int[] SFX = new int [] {
+            R.raw.test1, R.raw.test2, R.raw.test3
+    };
 }

@@ -2,6 +2,7 @@ package app.beanui;
 
 import android.app.Activity;
 import android.app.Application;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,7 +25,6 @@ public class MainActivity extends Activity {
         setupSoundOffBtn();
         setupLightsOnBtn();
         setupLightsOffBtn();
-        setupStartBtn();
     }
 
     private void setupSoundOnBtn() {
@@ -34,6 +34,9 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View view) {
                Constants.use_sound = true;
+                Toast.makeText(
+                        MainActivity.this,"Yes sound",Toast.LENGTH_LONG)
+                        .show();
             }
         });
     }
@@ -45,6 +48,9 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View view) {
                 Constants.use_sound = false;
+                Toast.makeText(
+                        MainActivity.this,"No sound",Toast.LENGTH_LONG)
+                        .show();
             }
         });
     }
@@ -56,6 +62,9 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View view) {
                 Constants.use_lights = true;
+                Toast.makeText(
+                        MainActivity.this,"Yes lights",Toast.LENGTH_LONG)
+                        .show();
             }
         });
     }
@@ -67,22 +76,37 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View view) {
                 Constants.use_lights = false;
+                Toast.makeText(
+                        MainActivity.this,"No lights",Toast.LENGTH_LONG)
+                        .show();
             }
         });
     }
 
-    private void setupStartBtn() {
-        ImageButton startBtn = (ImageButton) findViewById(R.id.startButton);
+    public void DJ(int sound_type, int track_index, int volume) {
+        if (sound_type == 1)
+            playMusic(track_index,volume);
+            /* TODO: stop current music playing */
+        else
+            playSfx(track_index, volume);
+    }
 
-        startBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Constants.is_on = true;
-                Toast.makeText(
-                        MainActivity.this,"Starting",Toast.LENGTH_LONG)
-                        .show();
-            }
-        });
+    public float convert_volume(int volume) {
+        return (float)(Math.log(Constants.MAX_VOLUME-volume)/Math.log(Constants.MAX_VOLUME));
+    }
+
+    public void playMusic(int track_index, int volume) {
+        MediaPlayer mediaPlayer = new MediaPlayer().create(this, Constants.MUSIC[track_index]);
+        float media_volume= 1- convert_volume(volume);
+        mediaPlayer.setVolume(media_volume, media_volume);
+        mediaPlayer.start();
+    }
+
+    public void playSfx(int track_index, int volume) {
+        MediaPlayer mediaPlayer = new MediaPlayer().create(this, Constants.SFX[track_index]);
+        float media_volume= 1- convert_volume(volume);
+        mediaPlayer.setVolume(media_volume, media_volume);
+        mediaPlayer.start();
     }
 
     @Override
