@@ -25,6 +25,18 @@ public class MainActivity extends Activity {
         setupSoundOffBtn();
         setupLightsOnBtn();
         setupLightsOffBtn();
+        setupMusicTestBtn();
+    }
+
+    private void setupMusicTestBtn() {
+        ImageButton soundOnBtn = (ImageButton) findViewById(R.id.startButton);
+
+        soundOnBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DJ(1,0,20);
+            }
+        });
     }
 
     private void setupSoundOnBtn() {
@@ -76,6 +88,7 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View view) {
                 Constants.use_lights = false;
+                DJ(0,0,50);
                 Toast.makeText(
                         MainActivity.this,"No lights",Toast.LENGTH_LONG)
                         .show();

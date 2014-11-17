@@ -22,6 +22,6 @@ public class Constants extends Application {
             R.raw.test1, R.raw.test2, R.raw.test3
     };
     public static int[] SFX = new int [] {
-            R.raw.test1, R.raw.test2, R.raw.test3
+            R.raw.click, R.raw.click, R.raw.click
     };
 }
