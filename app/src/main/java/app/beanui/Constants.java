@@ -14,8 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Constants extends Application {
-    public static boolean use_lights = true;
-    public static boolean use_sound = true;
+    public static char use_lights = 'y';
+    public static char use_sound = 'y';
     public static boolean is_on = false;
     public static int MAX_VOLUME = 50;
     public static int[] MUSIC = new int [] {

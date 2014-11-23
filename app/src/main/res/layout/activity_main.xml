@@ -1,16 +1,17 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity"
-    android:background="#ffdbe2ff"
-    android:id="@+id/layout">
+
+    xmlns:tools="http://schemas.android.com/tools"
+
+    android:layout_width="match_parent"
+
+    android:layout_height="match_parent"
+
+    tools:context=".MainActivity" >
 
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/startButton"
+        android:id="@+id/onBtn"
         android:background="@drawable/startbutton"
         android:minHeight="100px"
         android:minWidth="200px"
@@ -23,8 +24,9 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="@string/app_title"
         android:id="@+id/textView"
-        android:layout_centerHorizontal="true"
-        android:textColor="#ff7e7fff" />
+        android:textColor="#ff7e7fff"
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@+id/soundOffBtn" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -32,10 +34,9 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="@string/use_sound"
         android:id="@+id/textView2"
-        android:layout_marginTop="48dp"
-        android:layout_below="@+id/textView"
-        android:layout_alignLeft="@+id/textView3"
-        android:textColor="#ff6e6dff" />
+        android:textColor="#ff6e6dff"
+        android:layout_alignBottom="@+id/soundOnBtn"
+        android:layout_alignRight="@+id/textView3" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -43,9 +44,9 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="@string/use_lights"
         android:id="@+id/textView3"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
-        android:textColor="#ff6566ff" />
+        android:textColor="#ff6566ff"
+        android:layout_above="@+id/soundOnBtn"
+        android:layout_centerHorizontal="true" />
 
     <ImageButton
         android:layout_width="wrap_content"
@@ -54,10 +55,9 @@
         android:background="@drawable/onbutton"
         android:minHeight="50dp"
         android:minWidth="75dp"
-        android:layout_marginTop="26dp"
-        android:layout_below="@+id/textView2"
-        android:layout_toLeftOf="@+id/startButton"
-        android:clickable="true" />
+        android:clickable="true"
+        android:layout_alignTop="@+id/soundOffBtn"
+        android:layout_alignLeft="@+id/lightsOnBtn" />
 
     <ImageButton
         android:layout_width="wrap_content"
@@ -66,9 +66,9 @@
         android:background="@drawable/offbutton"
         android:minHeight="50dp"
         android:minWidth="75dp"
-        android:layout_alignTop="@+id/soundOnBtn"
-        android:layout_toRightOf="@+id/startButton"
-        android:clickable="true" />
+        android:clickable="true"
+        android:layout_above="@+id/lightsOffBtn"
+        android:layout_toRightOf="@+id/onBtn" />
 
     <ImageButton
         android:layout_width="wrap_content"
@@ -77,9 +77,8 @@
         android:background="@drawable/offbutton"
         android:minHeight="50dp"
         android:minWidth="75dp"
-        android:layout_marginTop="29dp"
-        android:layout_below="@+id/textView3"
-        android:layout_toRightOf="@+id/startButton" />
+        android:layout_alignTop="@+id/lightsOnBtn"
+        android:layout_toRightOf="@+id/onBtn" />
 
     <ImageButton
         android:layout_width="wrap_content"
@@ -88,7 +87,9 @@
         android:background="@drawable/onbutton"
         android:minHeight="50dp"
         android:minWidth="75dp"
-        android:layout_alignTop="@+id/lightsOffBtn"
-        android:layout_toLeftOf="@+id/startButton" />
+        android:layout_above="@+id/onBtn"
+        android:layout_toLeftOf="@+id/onBtn"
+        android:layout_marginBottom="50dp" />
 
-</RelativeLayout>
+    </RelativeLayout>
+

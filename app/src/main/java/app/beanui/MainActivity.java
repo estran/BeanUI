@@ -1,51 +1,192 @@
 package app.beanui;
 
 import android.app.Activity;
-import android.app.Application;
-import android.media.MediaPlayer;
-import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.List;
+import android.bluetooth.BluetoothSocket;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.TextView;
+import android.widget.ImageButton;
+import android.media.MediaPlayer;
+import android.os.Handler;
+import android.util.Log;
+import android.widget.Toast;
+import android.content.Intent;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.UUID;
 
 public class MainActivity extends Activity {
+
+    private static final int REQUEST_ENABLE_BT = 1;
+    private String btMacAddress = "TODO";
+    private static final UUID MY_UUID = UUID.fromString("TODO");
+    private static final String TAG = "Tag";
+    private boolean canRead = true;
+    private Handler handler;
+    private OutputStream oStream;
+    private InputStream iStream;
+    private BluetoothSocket btSocket = null;
+    private BluetoothAdapter btAdapter;
+    byte delimiter = 12;
+    int readBufferPosition = 0;
+    byte[] readBuffer = new byte[1024];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //set up all Bluetooth stuff first
+        btAdapter = BluetoothAdapter.getDefaultAdapter();
+        if(btAdapter == null) {
+            Toast.makeText(getApplicationContext(),
+                    "This device does not support Bluetooth and will play " +
+                            "in Lights-only mode.",
+                    Toast.LENGTH_LONG).show();
+        }
         setupSoundOnBtn();
         setupSoundOffBtn();
         setupLightsOnBtn();
         setupLightsOffBtn();
-        setupMusicTestBtn();
+        setupOnBtn();
     }
 
-    private void setupMusicTestBtn() {
-        ImageButton soundOnBtn = (ImageButton) findViewById(R.id.startButton);
-
-        soundOnBtn.setOnClickListener(new View.OnClickListener() {
+    private void setupOnBtn() {
+        ImageButton onBtn = (ImageButton) findViewById(R.id.onBtn);
+        onBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DJ(1,0,20);
+                turnBTOn();
+                connectToBT();
+                sendSettings(Constants.use_lights, Constants.use_sound);
+                Toast.makeText(
+                        MainActivity.this,"Connecting",Toast.LENGTH_LONG)
+                        .show();
             }
         });
     }
 
+    public void connectToBT() {
+        Log.d(TAG, btMacAddress);
+        BluetoothDevice device = btAdapter.getRemoteDevice(btMacAddress);
+        Log.d(TAG, "Connecting...");
+        btAdapter.cancelDiscovery();
+        try {
+            btSocket = device.createRfcommSocketToServiceRecord(MY_UUID);
+            btSocket.connect();
+            Log.d(TAG, "Connected!");
+        } catch (IOException e) {
+            try {
+                btSocket.close();
+            } catch (IOException e1) {
+                Log.d(TAG, "Cannot close connection");
+                e1.printStackTrace();
+            }
+            Log.d(TAG, "Cannot create socket");
+            e.printStackTrace();
+        }
+        listenForData();
+    }
+
+    private void sendSettings(char firstSetting, char secondSetting) {
+        try {
+            oStream = btSocket.getOutputStream();
+        } catch (IOException e) {
+            Log.d(TAG, "Error before sending settings", e);
+            e.printStackTrace();
+        }
+        String message = Character.toString(firstSetting) + Character.toString(secondSetting);
+        byte[] msgBuffer = message.getBytes();
+
+        try {
+            oStream.write(msgBuffer);
+        } catch (IOException e) {
+            Log.d(TAG, "Error while sending settings", e);
+            e.printStackTrace();
+        }
+    }
+
+    public void listenForData()   {
+        try {
+            iStream = btSocket.getInputStream();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Thread readThread = new Thread(new Runnable() {
+            public void run()   {
+                while(!Thread.currentThread().isInterrupted() && canRead)   {
+                    try {
+                        int bytesAvailable = iStream.available();
+                        if(bytesAvailable > 0)  {
+                            byte[] packetBytes = new byte[bytesAvailable];
+                            iStream.read(packetBytes);
+                            for(int i=0;i<bytesAvailable;i++)   {
+                                byte b = packetBytes[i];
+                                if(b == delimiter)  {
+                                    byte[] encodedBytes = new byte[readBufferPosition];
+                                    System.arraycopy(readBuffer, 0, encodedBytes, 0, encodedBytes.length);
+                                    final String data = new String(encodedBytes, "US-ASCII");
+                                    readBufferPosition = 0;
+                                    handler.post(new Runnable() {
+                                        public void run()   {
+                                            Toast.makeText(getApplicationContext(),
+                                                    data,
+                                                    Toast.LENGTH_LONG).show();
+                                        }
+                                    });
+                                }
+                                else {
+                                    readBuffer[readBufferPosition++] = b;
+                                }
+                            }
+                        }
+                    }
+                    catch (IOException e)  {
+                        canRead = false;
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+        readThread.start();
+    }
+
+    public void turnBTOn(){
+        if (!btAdapter.isEnabled()) {
+            Intent turnOnIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(turnOnIntent, REQUEST_ENABLE_BT);
+            Toast.makeText(getApplicationContext(),"Bluetooth turned on" ,
+                    Toast.LENGTH_LONG).show();
+        }
+        else    {
+            Toast.makeText(getApplicationContext(),"Bluetooth is already on",
+                    Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        try {
+            btSocket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void setupSoundOnBtn() {
         ImageButton soundOnBtn = (ImageButton) findViewById(R.id.soundOnBtn);
-
         soundOnBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               Constants.use_sound = true;
+                Constants.use_sound = 'y';
                 Toast.makeText(
                         MainActivity.this,"Yes sound",Toast.LENGTH_LONG)
                         .show();
@@ -55,11 +196,10 @@ public class MainActivity extends Activity {
 
     private void setupSoundOffBtn() {
         ImageButton soundOffBtn = (ImageButton) findViewById(R.id.soundOffBtn);
-
         soundOffBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Constants.use_sound = false;
+                Constants.use_sound = 'n';
                 Toast.makeText(
                         MainActivity.this,"No sound",Toast.LENGTH_LONG)
                         .show();
@@ -69,11 +209,10 @@ public class MainActivity extends Activity {
 
     private void setupLightsOnBtn() {
         ImageButton lightsOnBtn = (ImageButton) findViewById(R.id.lightsOnBtn);
-
         lightsOnBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Constants.use_lights = true;
+                Constants.use_lights = 'y';
                 Toast.makeText(
                         MainActivity.this,"Yes lights",Toast.LENGTH_LONG)
                         .show();
@@ -83,11 +222,10 @@ public class MainActivity extends Activity {
 
     private void setupLightsOffBtn() {
         ImageButton lightsOffBtn = (ImageButton) findViewById(R.id.lightsOffBtn);
-
         lightsOffBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Constants.use_lights = false;
+                Constants.use_lights = 'n';
                 DJ(0,0,50);
                 Toast.makeText(
                         MainActivity.this,"No lights",Toast.LENGTH_LONG)
@@ -122,25 +260,4 @@ public class MainActivity extends Activity {
         mediaPlayer.start();
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 }
