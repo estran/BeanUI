@@ -6,17 +6,19 @@
 
     android:layout_height="match_parent"
 
-    tools:context=".MainActivity" >
+    tools:context=".MainActivity"
+    android:background="@drawable/beanBg">
 
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/onBtn"
         android:background="@drawable/startbutton"
-        android:minHeight="100px"
-        android:minWidth="200px"
+        android:minHeight="120px"
+        android:minWidth="250px"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="53dp" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -25,28 +27,11 @@
         android:text="@string/app_title"
         android:id="@+id/textView"
         android:textColor="#ff7e7fff"
-        android:layout_centerVertical="true"
-        android:layout_toLeftOf="@+id/soundOffBtn" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="@string/use_sound"
-        android:id="@+id/textView2"
-        android:textColor="#ff6e6dff"
-        android:layout_alignBottom="@+id/soundOnBtn"
-        android:layout_alignRight="@+id/textView3" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="@string/use_lights"
-        android:id="@+id/textView3"
-        android:textColor="#ff6566ff"
-        android:layout_above="@+id/soundOnBtn"
-        android:layout_centerHorizontal="true" />
+        android:typeface="monospace"
+        android:layout_marginTop="67dp"
+        android:textAlignment="center"
+        android:layout_alignParentTop="true"
+        android:layout_alignLeft="@+id/textView4" />
 
     <ImageButton
         android:layout_width="wrap_content"
@@ -56,7 +41,7 @@
         android:minHeight="50dp"
         android:minWidth="75dp"
         android:clickable="true"
-        android:layout_alignTop="@+id/soundOffBtn"
+        android:layout_below="@+id/textView2"
         android:layout_alignLeft="@+id/lightsOnBtn" />
 
     <ImageButton
@@ -67,8 +52,8 @@
         android:minHeight="50dp"
         android:minWidth="75dp"
         android:clickable="true"
-        android:layout_above="@+id/lightsOffBtn"
-        android:layout_toRightOf="@+id/onBtn" />
+        android:layout_alignTop="@+id/soundOnBtn"
+        android:layout_toRightOf="@+id/soundOnBtn" />
 
     <ImageButton
         android:layout_width="wrap_content"
@@ -78,7 +63,7 @@
         android:minHeight="50dp"
         android:minWidth="75dp"
         android:layout_alignTop="@+id/lightsOnBtn"
-        android:layout_toRightOf="@+id/onBtn" />
+        android:layout_toRightOf="@+id/lightsOnBtn" />
 
     <ImageButton
         android:layout_width="wrap_content"
@@ -88,8 +73,43 @@
         android:minHeight="50dp"
         android:minWidth="75dp"
         android:layout_above="@+id/onBtn"
-        android:layout_toLeftOf="@+id/onBtn"
-        android:layout_marginBottom="50dp" />
+        android:layout_alignRight="@+id/onBtn"
+        android:layout_marginBottom="28dp" />
 
-    </RelativeLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/use_lights"
+        android:id="@+id/textView3"
+        android:textColor="#ffdccaff"
+        android:typeface="monospace"
+        android:layout_alignBottom="@+id/lightsOnBtn"
+        android:layout_alignLeft="@+id/textView2" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/use_sound"
+        android:id="@+id/textView2"
+        android:textColor="#ffe3cbff"
+        android:typeface="monospace"
+        android:layout_below="@+id/textView"
+        android:layout_toLeftOf="@+id/onBtn"
+        android:layout_marginTop="119dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/action_settings"
+        android:id="@+id/textView4"
+        android:layout_marginBottom="54dp"
+        android:typeface="monospace"
+        android:textColor="#ffded1ff"
+        android:layout_above="@+id/soundOnBtn"
+        android:layout_centerHorizontal="true" />
+
+</RelativeLayout>
 
