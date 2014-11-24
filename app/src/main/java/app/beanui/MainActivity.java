@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 
 import android.os.Bundle;
+import android.os.ParcelUuid;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.ImageButton;
@@ -24,8 +25,7 @@ import java.util.UUID;
 public class MainActivity extends Activity {
 
     private static final int REQUEST_ENABLE_BT = 1;
-    private String btMacAddress = "TODO";
-    private static final UUID MY_UUID = UUID.fromString("TODO");
+    private String btMacAddress = "98:D3:31:30:0C:5C";
     private static final String TAG = "Tag";
     private boolean canRead = true;
     private Handler handler;
@@ -75,10 +75,13 @@ public class MainActivity extends Activity {
     public void connectToBT() {
         Log.d(TAG, btMacAddress);
         BluetoothDevice device = btAdapter.getRemoteDevice(btMacAddress);
+        ParcelUuid[] uuids;
+        uuids = device.getUuids();
         Log.d(TAG, "Connecting...");
         btAdapter.cancelDiscovery();
         try {
-            btSocket = device.createRfcommSocketToServiceRecord(MY_UUID);
+            btSocket = device.createRfcommSocketToServiceRecord(uuids[0].getUuid());
+            Log.d(TAG, "got UUid");
             btSocket.connect();
             Log.d(TAG, "Connected!");
         } catch (IOException e) {
