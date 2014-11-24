@@ -42,18 +42,12 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //set up all Bluetooth stuff first
-        btAdapter = BluetoothAdapter.getDefaultAdapter();
-        if(btAdapter == null) {
-            Toast.makeText(getApplicationContext(),
-                    "This device does not support Bluetooth and will play " +
-                            "in Lights-only mode.",
-                    Toast.LENGTH_LONG).show();
-        }
         setupSoundOnBtn();
         setupSoundOffBtn();
         setupLightsOnBtn();
         setupLightsOffBtn();
+        //set up all Bluetooth stuff first
+        btAdapter = BluetoothAdapter.getDefaultAdapter();
         setupOnBtn();
     }
 
@@ -62,14 +56,36 @@ public class MainActivity extends Activity {
         onBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                turnBTOn();
-                connectToBT();
-                sendSettings(Constants.use_lights, Constants.use_sound);
-                Toast.makeText(
+               if (btAdapter != null) {
+                   turnBTOn();
+                   connectToBT();
+
+                   sendSettings(Constants.use_lights, Constants.use_sound);
+                   Toast.makeText(
                         MainActivity.this,"Connecting",Toast.LENGTH_LONG)
                         .show();
+                  }
+                else {
+                   Toast.makeText(getApplicationContext(),
+                           "This device does not support Bluetooth and will play " +
+                                   "in Lights-only mode.",
+                           Toast.LENGTH_LONG).show();
+               }
             }
         });
+    }
+
+    public void turnBTOn(){
+        if (btAdapter != null && !btAdapter.isEnabled()) {
+            Intent turnOnIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(turnOnIntent, REQUEST_ENABLE_BT);
+            Toast.makeText(getApplicationContext(),"Bluetooth turned on" ,
+                    Toast.LENGTH_LONG).show();
+        }
+        else    {
+            Toast.makeText(getApplicationContext(),"Bluetooth is already on",
+                    Toast.LENGTH_LONG).show();
+        }
     }
 
     public void connectToBT() {
@@ -159,19 +175,6 @@ public class MainActivity extends Activity {
             }
         });
         readThread.start();
-    }
-
-    public void turnBTOn(){
-        if (!btAdapter.isEnabled()) {
-            Intent turnOnIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(turnOnIntent, REQUEST_ENABLE_BT);
-            Toast.makeText(getApplicationContext(),"Bluetooth turned on" ,
-                    Toast.LENGTH_LONG).show();
-        }
-        else    {
-            Toast.makeText(getApplicationContext(),"Bluetooth is already on",
-                    Toast.LENGTH_LONG).show();
-        }
     }
 
     @Override
