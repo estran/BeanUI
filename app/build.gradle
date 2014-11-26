@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 15
-    buildToolsVersion "19.1.0"
+    compileSdkVersion 20
+    buildToolsVersion "20.0.0"
 
     defaultConfig {
-        applicationId "app.beanui"
+        applicationId "com.example.mcornett.testapp"
         minSdkVersion 15
-        targetSdkVersion 15
+        targetSdkVersion 20
         versionCode 1
         versionName "1.0"
     }
