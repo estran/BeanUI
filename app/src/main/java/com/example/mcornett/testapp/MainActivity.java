@@ -6,6 +6,7 @@ package com.example.mcornett.testapp;
         import java.io.OutputStream;
         import java.lang.reflect.Method;
         import java.util.UUID;
+        import java.util.Set;
 
         import com.example.mcornett.testapp.R;
 
@@ -22,31 +23,22 @@ package com.example.mcornett.testapp;
         import android.view.View;
         import android.view.View.OnClickListener;
         import android.widget.Button;
-        import android.widget.ImageButton;
         import android.widget.TextView;
         import android.widget.Toast;
 
 public class MainActivity extends Activity {
     private static final String TAG = "bluetooth1";
 
-    Button btnOn, btnOff;
+    Button btnOn, btnOff, restart;
     Handler handler;
     final int RECIEVE_MESSAGE = 1;
     private BluetoothAdapter btAdapter = null;
     private BluetoothSocket btSocket = null;
+    private String deviceName = null;
     private OutputStream outStream = null;
     private InputStream inStream = null;
     private StringBuilder sb = new StringBuilder();
     private ConnectedThread mConnectedThread;
-    private static char useSound = 'y';
-    private static char useLights = 'y';
-    public static int MAX_VOLUME = 50;
-    public static int[] MUSIC = new int [] {
-            R.raw.dyehl, R.raw.dd, R.raw.wotb
-    };
-    public static int[] SFX = new int [] {
-            R.raw.boing, R.raw.giggles
-    };
 
     // SPP UUID service
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
@@ -63,6 +55,9 @@ public class MainActivity extends Activity {
 
         btnOn = (Button) findViewById(R.id.btnOn);
         btnOff = (Button) findViewById(R.id.btnOff);
+        restart = (Button) findViewById(R.id.restart);
+
+
         handler = new Handler() {
             public void handleMessage(android.os.Message msg) {
                 switch (msg.what) {
@@ -101,14 +96,41 @@ public class MainActivity extends Activity {
         btnOff.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
 
-                mConnectedThread.write("000");
+                mConnectedThread.write("111");
 
             }
         });
-        setupSoundOnBtn();
-        setupSoundOffBtn();
-        setupLightsOnBtn();
-        setupLightsOffBtn();
+
+        restart.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+
+                BluetoothDevice device = btAdapter.getRemoteDevice(address);
+                try {
+                    Thread.sleep(500);
+                } catch (Exception f){}
+                try {
+
+                    outStream.write("aaa".getBytes());
+                } catch (IOException e1) {
+                    Toast.makeText(getBaseContext(), "Connecting ...", Toast.LENGTH_LONG).show();
+                    try {
+                        btSocket.close();
+                    } catch (Exception e){}
+                    Toast.makeText(getBaseContext(), "Connected", Toast.LENGTH_LONG).show();
+                    onResume();
+                }
+                try {
+                    btSocket.connect();
+                } catch (Exception e2) {
+                    return;
+                }
+                onResume();
+            }
+
+        });
+
+
+
     }
 
     private BluetoothSocket createBluetoothSocket(BluetoothDevice device) throws IOException {
@@ -165,7 +187,7 @@ public class MainActivity extends Activity {
 
         mConnectedThread = new ConnectedThread(btSocket);
         mConnectedThread.start();
-
+        deviceName = device.getName();
     }
 
     @Override
@@ -254,85 +276,6 @@ public class MainActivity extends Activity {
                 Log.d(TAG, "...Error data send: " + e.getMessage() + "...");
             }
         }
-    }
-
-    private void setupSoundOnBtn() {
-        ImageButton soundOnBtn = (ImageButton) findViewById(R.id.soundOnBtn);
-        soundOnBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                useSound = 'y';
-                Toast.makeText(
-                        MainActivity.this,"Yes sound",Toast.LENGTH_LONG)
-                        .show();
-            }
-        });
-    }
-
-    private void setupSoundOffBtn() {
-        ImageButton soundOffBtn = (ImageButton) findViewById(R.id.soundOffBtn);
-        soundOffBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                useSound = 'n';
-                Toast.makeText(
-                        MainActivity.this,"No sound",Toast.LENGTH_LONG)
-                        .show();
-            }
-        });
-    }
-
-    private void setupLightsOnBtn() {
-        ImageButton lightsOnBtn = (ImageButton) findViewById(R.id.lightsOnBtn);
-        lightsOnBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                useLights = 'y';
-                Toast.makeText(
-                        MainActivity.this,"Yes lights",Toast.LENGTH_LONG)
-                        .show();
-            }
-        });
-    }
-
-    private void setupLightsOffBtn() {
-        ImageButton lightsOffBtn = (ImageButton) findViewById(R.id.lightsOffBtn);
-        lightsOffBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                useLights = 'n';
-                DJ(0,0,50);
-                Toast.makeText(
-                        MainActivity.this,"No lights",Toast.LENGTH_LONG)
-                        .show();
-            }
-        });
-    }
-
-    public void DJ(int sound_type, int track_index, int volume) {
-        if (sound_type == 1)
-            playMusic(track_index,volume);
-            /* TODO: stop current music playing */
-        else
-            playSfx(track_index, volume);
-    }
-
-    public float convert_volume(int volume) {
-        return (float)(Math.log(MAX_VOLUME-volume)/Math.log(MAX_VOLUME));
-    }
-
-    public void playMusic(int track_index, int volume) {
-        MediaPlayer mediaPlayer = new MediaPlayer().create(this, MUSIC[track_index]);
-        float media_volume= 1- convert_volume(volume);
-        mediaPlayer.setVolume(media_volume, media_volume);
-        mediaPlayer.start();
-    }
-
-    public void playSfx(int track_index, int volume) {
-        MediaPlayer mediaPlayer = new MediaPlayer().create(this, SFX[track_index]);
-        float media_volume= 1- convert_volume(volume);
-        mediaPlayer.setVolume(media_volume, media_volume);
-        mediaPlayer.start();
     }
 }
 
